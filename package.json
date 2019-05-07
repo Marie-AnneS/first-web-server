@@ -1,0 +1,19 @@
+{
+  "name": "first-web-server",
+  "version": "1.0.0",
+  "description": "Package pour projet 1",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Marie-AnneS/first-web-server.git"
+  },
+  "author": "Marie-Anne Seim",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Marie-AnneS/first-web-server/issues"
+  },
+  "homepage": "https://github.com/Marie-AnneS/first-web-server#readme"
+}
