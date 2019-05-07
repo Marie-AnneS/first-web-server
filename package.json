@@ -4,6 +4,7 @@
   "description": "Package pour projet 1",
   "main": "app.js",
   "scripts": {
+    "start": "nodemon -L ./express_server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -17,6 +18,7 @@
   },
   "homepage": "https://github.com/Marie-AnneS/first-web-server#readme",
   "dependencies": {
+    "ejs": "^2.6.1",
     "express": "^4.16.4"
   },
   "devDependencies": {
