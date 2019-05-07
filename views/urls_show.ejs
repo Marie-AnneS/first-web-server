@@ -9,14 +9,10 @@
   <title>TinyApp</title>
 </head>
 <body style="font-size:20px; padding:50px;">
-  <%- include partials/_header.ejs %>
-  <h2>My URLs</h2>
-  <ul>
-  <% for (var key in urls){%>
-    <li>
-        <b><%- key %>:</b> <%- urls[key] %>
-    </li>
-  <%}%>
-  </ul>
+    <%- include partials/_header.ejs %>
+    <h2> <b> TinyUrl for <%= longURL %></b></h2> 
+    <p>
+    <%= shortURL %>
+    </p>
 </body>
 </html>
