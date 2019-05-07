@@ -10,7 +10,12 @@ var urlDatabase = {
 app.get("/", (req, res) => {
     res.send("Hello!");
   });
-  
+
+app.get("/hello", (req, res) => {
+    console.log("YO")
+  res.send("<html><body>Hello <b>World</b></body></html>\n");
+});
+
 app.get("/urls.json", (req, res) => {
     res.json(urlDatabase);
   });
