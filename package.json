@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/Marie-AnneS/first-web-server/issues"
   },
-  "homepage": "https://github.com/Marie-AnneS/first-web-server#readme"
+  "homepage": "https://github.com/Marie-AnneS/first-web-server#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
 }
