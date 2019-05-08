@@ -2,11 +2,12 @@ const http = require("http");
 var express = require("express");
 var app = express();
 var PORT = 8080; // default port 8080
+var cookieParser = require('cookie-parser')
 const bodyParser = require("body-parser");
 
 app.use(bodyParser.urlencoded({ extended: true }));
-
 app.set("view engine", "ejs");
+app.use(cookieParser());
 
 var urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
@@ -21,6 +22,7 @@ const exsitingKey = (key) => {
   //for (const  in urlDatabase)
 }
 //route des pages
+
 app.post("/urls", (req, res) => {
   urlDatabase["new_url"] = req.body.longURL; // Log the POST request body to the console
   console.log(urlDatabase);
@@ -49,6 +51,12 @@ app.get("/urls", (req, res) => {
 
 app.get("/", (req, res) => {
   res.send("Hello!");
+});
+
+app.post("/login", (req, res) => {
+  const user = res.cookie;
+  console.log(user);
+  res.render("urls_new");
 });
 
 app.get("/urls/new", (req, res) => {
