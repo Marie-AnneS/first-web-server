@@ -14,13 +14,19 @@
       integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
       crossorigin="anonymous"
     />
-    <title>TinyApp</title>
+    <title>ShortURL</title>
   </head>
   <body style="font-size:20px; padding:50px;">
     <%- include partials/_header.ejs %>
-    <h2><b> TinyUrl for <%= longURL %></b></h2>
-    <p>
-      <%= shortURL %>
-    </p>
+    <h2><b>ShortURL:</b> <%= shortURL %></h2>
+   
+
+    <form class="form-inline" action="/urls/<%= shortURL %>" method="POST">
+      <div class="form-group mb-2">
+        <input class="form-control" type="text" name="newUrl" placeholder="<%= longURL %>" style="width: 300px; margin: 1em">
+        <button type="submit" class="btn btn-primary">Update</button>
+      </div>
+    </form>
+
   </body>
 </html>

@@ -17,12 +17,21 @@ const deleteUrl = ( idUrl ) => {
   //console.log(urlDatabase);
   delete urlDatabase[idUrl];
 }; //deleteUrl("9sm5xK"); console.log(urlDatabase);
-
+const exsitingKey = (key) => {
+  //for (const  in urlDatabase)
+}
 //route des pages
 app.post("/urls", (req, res) => {
   urlDatabase["new_url"] = req.body.longURL; // Log the POST request body to the console
   console.log(urlDatabase);
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  res.redirect("/urls"); // Respond with 'Ok' (we will replace this)
+});
+
+app.post("/urls/:shortURL", (req, res) => {
+  const shortUrl = req.params.shortURL;
+  urlDatabase[shortUrl] = req.body.newUrl; // Log the POST request body to the console
+
+  res.redirect("/urls");
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
