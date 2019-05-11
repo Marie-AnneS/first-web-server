@@ -5,6 +5,7 @@ var PORT = 8080;
 var cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
+var cookieSession = require('cookie-session');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
@@ -45,7 +46,6 @@ const findUserId = (user_id_bd, user_id) => {
 const urlsForUser = (id) => {
   var arrUrlfromShort = []; 
   var copieurUrlDatabase = Object.assign({}, urlDatabase); 
-
   var userId = findUserId(copieurUrlDatabase, id)
    for (const key in copieurUrlDatabase) {
     if (copieurUrlDatabase[key].userID === id){
