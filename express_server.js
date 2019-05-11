@@ -1,22 +1,37 @@
 const http = require("http");
 var express = require("express");
 var app = express();
-var PORT = 8080; // default port 8080
+var PORT = 8080; 
 var cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
+const bcrypt = require('bcrypt');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use(cookieParser());
 
+//  --------- DATABASE  -------------------------  //
 const urlDatabase = {
   b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
   i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" },
   bdfixQ: { longURL: "https://www.telequebec.tv", userID: "22sd2" },
   irf44r: { longURL: "https://fr.wiktionary.org", userID: "22sd2" }
 };
-var id = "aJ48lW";
 
+const userDB = {
+  "aJ48lW": {
+    id: "aJ48lW",
+    email: "marie.anne.seim@gmail.com",
+    password: "poire"
+  },
+  "22sd2": {
+    id: "22sd22",
+    email: "anne.seim@gmail.com",
+    password: "anne"
+  }
+};
+
+//  --------- Function  -------------------------  //
 const findUserId = (user_id_bd, user_id) => {
   for (const key in user_id_bd) {
     if (user_id_bd[key].userID === user_id) {
@@ -26,7 +41,7 @@ const findUserId = (user_id_bd, user_id) => {
   return false;
 };
 
-//console.log(findUserId(urlsForUser("22sd2"), "22sd2"));
+/* This one don't work's
 const urlsForUser = (id) => {
   var arrUrlfromShort = []; 
   var copieurUrlDatabase = Object.assign({}, urlDatabase); 
@@ -37,9 +52,8 @@ const urlsForUser = (id) => {
       arrUrlfromShort.push(copieurUrlDatabase[key].longURL);
     }
   } 
-  //console.log(arrUrlfromShort);
   return arrUrlfromShort;
-};
+}; */
 
 const dbForUser = (id) => {
   var copieurUrlDatabase = Object.assign({}, urlDatabase); 
@@ -50,26 +64,7 @@ const dbForUser = (id) => {
       delete copieurUrlDatabase[key];
     }
   } 
-  /*if (userId) {
-    if (copieurUrlDatabase[userId].userID !== id) {
-      copieurUrlDatabase
-      delete copieurUrlDatabase[userId];
-    }
-  }*/
   return copieurUrlDatabase;
-};
-//console.log(urlsForUser(id));
-const userDB = {
-  "aJ48lW": {
-    id: "aJ48lW",
-    email: "marie.anne.seim@gmail.com",
-    password: "poire"
-  },
-  "22sd2": {
-    id: "22sd22",
-    email: "anne.seim@gmail.com",
-    password: "poire"
-  }
 };
 
 const generateRandomString = () =>
@@ -97,8 +92,6 @@ const addNewObjUrl = (longUrl, user_id) => {
   return NewObjURL;
 }
 
-
-
 const findEmail = (dB, email) => {
   for (const key in dB) {
     if (dB[key].email === email) {
@@ -107,15 +100,16 @@ const findEmail = (dB, email) => {
   }
   return false;
 };
-//var strpassword = "poire";
+
+const scriptCompareSync = (pw, hashPw) => {
+  return bcrypt.compareSync(pw, hashPw);
+}
 
 const authentif = function(email, passwordpm) {
-var user = findEmail(userDB, email);
-  if (user) {
-    if (userDB[user].password === passwordpm) {
-      console.log(userDB[user].password);
+  
+  var userId =  findEmail(userDB, email)
+  if (userId && bcrypt.compareSync(passwordpm, userDB[userId].password)) {
       return true;
-    }
   }
 };
 
@@ -128,24 +122,18 @@ const deleteUrl = idUrl => {
 app.post("/urls", (req, res) => {
   const ramdomShortUrl = generateRandomString();
   const LongUrl = req.body.longURL;
-  const user = req.cookies["user_id"];
-//console.log(`LongUrl: ${LongUrl}  userId: ${user}`);
-  
-  urlDatabase[ramdomShortUrl] = { longURL: LongUrl, userID: user }
-  
+  const user = req.cookies["user_id"];  
+  urlDatabase[ramdomShortUrl] = { longURL: LongUrl, userID: user }  
   res.redirect("/urls"); // Respond with 'Ok' (we will replace this)
 });
 
 app.post("/logout", (req, res) => {
   const user = req.cookies["user_id"];
-  console.log(user);
   const email = userDB[user].email;
   const password = userDB[user].password;
-
   res.clearCookie("user_id", user);
   res.clearCookie("user_email", email);
   res.clearCookie("user_password", password);
-
   res.redirect("/urls");
 });
 
@@ -172,22 +160,21 @@ app.post("/urls/:shortURL", (req, res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortUrl = req.params.shortURL;
   deleteUrl(shortUrl);
-  //console.log(shortUrl);
   res.redirect("/urls");
 });
 
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
-  // const user = returnUser( userDB, email );
+  const criptPassword = bcrypt.hashSync(password, 10); 
   let user_id = findEmail(userDB, email);
 
   if (user_id || !email || !password) {
     res.status(400).send("Votre Email ou Password existe deja");
   } else {
-    let new_user = addNewUser(email, password);
+    let new_user = addNewUser(email, criptPassword);
     res.cookie("user_id", new_user.id);
     res.cookie("user_email", email);
-    res.cookie("user_password", password);
+    res.cookie("user_password", criptPassword);
     res.redirect("/urls");
   }
 });
@@ -225,7 +212,7 @@ app.get("/urls/new", (req, res) => {
   let templateVars = {
     obsUser: userDB[req.cookies["user_id"]],
     user_id: req.cookies["user_id"],
-    urls: urlsForUser(req.cookies["user_id"]),
+    urls: dbForUser(req.cookies["user_id"]),
   };
   if (templateVars.user_id) {
     res.render("urls_new", templateVars);
@@ -237,11 +224,10 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
-  //findUserId: findUserId(urlsForUser(urlsForUser(req.cookies["user_id"])), req.cookies["user_id"]),
     objURL: urlDatabase[req.params.shortURL],
     obsUser: userDB[req.cookies["user_id"]],
     shortURL: req.params.shortURL,
-    urls: urlsForUser(req.cookies["user_id"]),
+    urls: dbForUser(req.cookies["user_id"]),
     user_email: req.cookies["email"],
     user_id: req.cookies["user_id"],
     user_password: req.cookies["password"],
