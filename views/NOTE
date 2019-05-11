@@ -1,0 +1,6 @@
+<!-- <li>
+        <b><a href="/urls/<%- key %>"> <%- key %>:</a></b> ➡️ <%- urls[key].longURL %>
+        <form method="POST" action="/urls/<%- key %>/delete" style="display:inline-block; right: 0;">
+          <button type="submit" class="btn btn-primary">delete 🚮</button>
+        </form>
+      </li> -->

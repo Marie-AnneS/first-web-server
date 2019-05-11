@@ -1,35 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
 
-    <!-- Bootstrap CSS -->
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
-      integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
-      crossorigin="anonymous"
-    />
-    <title>ShortURL</title>
-  </head>
-  <body style="font-size:20px; padding:50px;">
-    <%- include partials/_header.ejs %>
-    <h2><b>ShortURL:</b> <%= shortURL %></h2>
-   
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
-    <form class="form-inline" action="/urls/<%= shortURL %>" method="POST" style="display:inline-block;" >
-      <div class="form-group mb-2">
-        <input class="form-control" type="text" name="newUrl" placeholder="<%= longURL %>" style="width: 300px; margin: 1em;">
-        <button type="submit" class="btn btn-primary">Update</button>
-      </div>
-    </form>
-    <form method="POST" action="/urls/<%- shortURL %>/delete" style="display:inline-block;">
-      <button type="submit" class="btn btn-primary">delete 🚮</button>
-    </form>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+    integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous" />
+  <title>ShortURL</title>
+</head>
 
-  </body>
+<body style="font-size:20px; padding:50px;">
+  <%- include partials/_header.ejs %>
+
+  <% if (objURL.userID !== user_id){ %>
+
+  Vous n'avez pas acces a cette page
+  <% } else {%>
+
+  <h2><b>Short URL:</b> <%= shortURL %></h2>
+  <h2><b>Long Url:</b> <%= objURL.longURL %></h2>
+
+
+  <form class="form-inline" action="/urls/<%= shortURL %>" method="POST" style="display:inline-block;">
+    <div class="form-group mb-2">
+      <input class="form-control" type="text" name="newUrl" placeholder="<%= objURL.longURL %>"
+        style="width: 300px; margin: 1em;">
+      <button type="submit" class="btn btn-primary">Update</button>
+    </div>
+  </form>
+  <form method="POST" action="/urls/<%- shortURL %>/delete" style="display:inline-block;">
+    <button type="submit" class="btn btn-primary">delete 🚮</button>
+  </form>
+  <% }%>
+</body>
+
 </html>

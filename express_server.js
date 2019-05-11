@@ -10,13 +10,58 @@ app.set("view engine", "ejs");
 app.use(cookieParser());
 
 const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" },
+  bdfixQ: { longURL: "https://www.telequebec.tv", userID: "22sd2" },
+  irf44r: { longURL: "https://fr.wiktionary.org", userID: "22sd2" }
+};
+var id = "aJ48lW";
+
+const findUserId = (user_id_bd, user_id) => {
+  for (const key in user_id_bd) {
+    if (user_id_bd[key].userID === user_id) {
+      return true;
+    }
+  }
+  return false;
 };
 
+//console.log(findUserId(urlsForUser("22sd2"), "22sd2"));
+const urlsForUser = (id) => {
+  var arrUrlfromShort = []; 
+  var copieurUrlDatabase = Object.assign({}, urlDatabase); 
+
+  var userId = findUserId(copieurUrlDatabase, id)
+   for (const key in copieurUrlDatabase) {
+    if (copieurUrlDatabase[key].userID === id){
+      arrUrlfromShort.push(copieurUrlDatabase[key].longURL);
+    }
+  } 
+  //console.log(arrUrlfromShort);
+  return arrUrlfromShort;
+};
+
+const dbForUser = (id) => {
+  var copieurUrlDatabase = Object.assign({}, urlDatabase); 
+  var userId = findUserId(copieurUrlDatabase, id)
+   for (const key in copieurUrlDatabase) {
+    if (copieurUrlDatabase[key].userID !== id){
+      copieurUrlDatabase
+      delete copieurUrlDatabase[key];
+    }
+  } 
+  /*if (userId) {
+    if (copieurUrlDatabase[userId].userID !== id) {
+      copieurUrlDatabase
+      delete copieurUrlDatabase[userId];
+    }
+  }*/
+  return copieurUrlDatabase;
+};
+//console.log(urlsForUser(id));
 const userDB = {
-  "22yy22": {
-    id: "22yy22",
+  "aJ48lW": {
+    id: "aJ48lW",
     email: "marie.anne.seim@gmail.com",
     password: "poire"
   },
@@ -44,10 +89,15 @@ const addNewUser = (email, password) => {
   return userCript;
 };
 
-const addUser = userId => {
-  userDB.user = userId;
-  //console.log(userDB);
-};
+const addNewObjUrl = (longUrl, user_id) => {
+  const NewObjURL = {
+    longUrl: longUrl,
+    user_id: user_id
+  };
+  return NewObjURL;
+}
+
+
 
 const findEmail = (dB, email) => {
   for (const key in dB) {
@@ -60,18 +110,14 @@ const findEmail = (dB, email) => {
 //var strpassword = "poire";
 
 const authentif = function(email, passwordpm) {
-  var user = findEmail(userDB, email);
-
+var user = findEmail(userDB, email);
   if (user) {
     if (userDB[user].password === passwordpm) {
       console.log(userDB[user].password);
       return true;
     }
-    //console.log(userDB[user].password === strpassword);
   }
 };
-//console.log(findEmail(userDB, "marie.anne.seim@gmail.com"));
-//console.log(verifPass(strpassword));
 
 const deleteUrl = idUrl => {
   delete urlDatabase[idUrl];
@@ -80,8 +126,13 @@ const deleteUrl = idUrl => {
 //-----------   POST  ---------------//
 
 app.post("/urls", (req, res) => {
-  urlDatabase[generateRandomString()] = req.body.longURL; // Log the POST request body to the console
-  console.log(urlDatabase);
+  const ramdomShortUrl = generateRandomString();
+  const LongUrl = req.body.longURL;
+  const user = req.cookies["user_id"];
+//console.log(`LongUrl: ${LongUrl}  userId: ${user}`);
+  
+  urlDatabase[ramdomShortUrl] = { longURL: LongUrl, userID: user }
+  
   res.redirect("/urls"); // Respond with 'Ok' (we will replace this)
 });
 
@@ -114,7 +165,7 @@ app.post("/login", (req, res) => {
 
 app.post("/urls/:shortURL", (req, res) => {
   const shortUrl = req.params.shortURL;
-  urlDatabase[shortUrl] = req.body.newUrl; // Log the POST request body to the console
+  urlDatabase[req.params.shortURL].longURL = req.body.newUrl; // Log the POST request body to the console
   res.redirect("/urls");
 });
 
@@ -145,16 +196,24 @@ app.post("/register", (req, res) => {
 
 app.get("/urls", (req, res) => {
   let templateVars = {
+    findUserId: findUserId(urlDatabase ,req.cookies["user_id"]),
+    longURL: urlDatabase[req.cookies["user_id"]],
+    obsUser: userDB[req.cookies["user_id"]],
+    shortURL: req.params.shortURL,
+    urlDatabase: urlDatabase,
+    urlsForUser: dbForUser(req.cookies["user_id"]), //urlsForUser
+    user_email: req.cookies["email"],
     user_id: req.cookies["user_id"],
-    urls: urlDatabase,
-    obsUser: userDB[req.cookies["user_id"]]
+    user_password: req.cookies["password"],
+    userDB: userDB,
   };
   res.render("urls_index", templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
   const shortUrl = req.params.shortURL;
-  let longURL = urlDatabase[shortUrl];
+  const longURL = urlDatabase[shortUrl].longURL;
+ 
   res.redirect(longURL);
 });
 
@@ -164,22 +223,31 @@ app.get("/", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   let templateVars = {
+    obsUser: userDB[req.cookies["user_id"]],
     user_id: req.cookies["user_id"],
-    urls: urlDatabase,
-    obsUser: userDB[req.cookies["user_id"]]
+    urls: urlsForUser(req.cookies["user_id"]),
   };
-  res.render("urls_new", templateVars);
+  if (templateVars.user_id) {
+    res.render("urls_new", templateVars);
+  } else {
+    res.redirect("/login");
+  }
+  
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const shortUrl = req.params.shortURL;
   let templateVars = {
+  //findUserId: findUserId(urlsForUser(urlsForUser(req.cookies["user_id"])), req.cookies["user_id"]),
+    objURL: urlDatabase[req.params.shortURL],
+    obsUser: userDB[req.cookies["user_id"]],
+    shortURL: req.params.shortURL,
+    urls: urlsForUser(req.cookies["user_id"]),
+    user_email: req.cookies["email"],
     user_id: req.cookies["user_id"],
-    shortURL: shortUrl,
+    user_password: req.cookies["password"],
     userDB: userDB,
-    longURL: urlDatabase[shortUrl],
-    obsUser: userDB[req.cookies["user_id"]]
   };
+
   res.render("urls_show", templateVars);
 });
 
