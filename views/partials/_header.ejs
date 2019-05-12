@@ -1,27 +1,28 @@
 <h1>
     TinyApp
 </h1>
-
-<!-- LOGIN -->
-<% if ( obsUser ){%>
 <div style="display: flex;">
     <h3 style="padding-right: 10px;"><a href="/urls">URLs</a> | </h3>
     <h3><a href="/urls/new">Create New TinyURL</a></h3>
 </div>
-<p>Logged in As: <%= obsUser.email %></p>
 
 <form class="form-inline" action="/logout" method="POST">
     <div class="form-group mb-2">
         <button type="submit" name="ereaseCookies" class="btn btn-primary">Logout</button>
     </div>
-</form>
+</form><div style="display: flex;">
+    <h3 style="padding-right: 10px;"><a href="/login">Login</a> | </h3>
+    <h3><a href="/register">Register</a></h3>
+</div>
+<!-- LOGIN -->
+<% if ( obsUser ){%>
+
+<p>Logged in As: <%= obsUser.email %></p>
+
 
 
 <!-- LOGOUT -->
 <%} else {%>
-<div style="display: flex;">
-    <h3 style="padding-right: 10px;"><a href="/login">Login</a> | </h3>
-    <h3><a href="/register">Register</a></h3>
-</div>
+
 
 <%}%> 
