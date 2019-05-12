@@ -1,17 +1,19 @@
-const http = require("http");
-var express = require("express");
-var app = express();
-var PORT = 8080; 
-var cookieParser = require("cookie-parser");
-const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
-var cookieSession = require('cookie-session');
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser"); // !!! a enleve
+const cookieSession = require('cookie-session');
+const express = require("express");
+const http = require("http");
 
-app.use(bodyParser.urlencoded({ extended: true }));
+const app = express();
+const PORT = 8080; 
+
 app.set("view engine", "ejs");
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 //  --------- DATABASE  -------------------------  //
+
 const urlDatabase = {
   b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
   i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" },
@@ -33,6 +35,13 @@ const userDB = {
 };
 
 //  --------- Function  -------------------------  //
+
+//    funtion Obligatoire
+const generateRandomString = () =>
+  Math.random()
+    .toString(36)
+    .substr(7);
+
 const findUserId = (user_id_bd, user_id) => {
   for (const key in user_id_bd) {
     if (user_id_bd[key].userID === user_id) {
@@ -41,6 +50,16 @@ const findUserId = (user_id_bd, user_id) => {
   }
   return false;
 };
+
+const findEmail = (dB, email) => {
+  for (const key in dB) {
+    if (dB[key].email === email) {
+      return key;
+    }
+  }
+  return false;
+};
+//    funtion Optionel
 
 /* This one don't work's
 const urlsForUser = (id) => {
@@ -67,10 +86,7 @@ const dbForUser = (id) => {
   return copieurUrlDatabase;
 };
 
-const generateRandomString = () =>
-  Math.random()
-    .toString(36)
-    .substr(7);
+
 
 const addNewUser = (email, password) => {
   const idGenerate = generateRandomString();
@@ -92,18 +108,6 @@ const addNewObjUrl = (longUrl, user_id) => {
   return NewObjURL;
 }
 
-const findEmail = (dB, email) => {
-  for (const key in dB) {
-    if (dB[key].email === email) {
-      return key;
-    }
-  }
-  return false;
-};
-
-const scriptCompareSync = (pw, hashPw) => {
-  return bcrypt.compareSync(pw, hashPw);
-}
 
 const authentif = function(email, passwordpm) {
   
