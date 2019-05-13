@@ -74,22 +74,7 @@ const findUserByEmail = (dB, email) => {
   return false;
 };
 
-/* This one don't work's
-const urlsForUser = (id) => {
-  var arrUrlfromShort = []; 
-  var copieurUrlDatabase = Object.assign({}, urlDatabase); 
-  var userId = findUserId(copieurUrlDatabase, id)
-   for (const key in copieurUrlDatabase) {
-    if (copieurUrlDatabase[key].userID === id){
-      arrUrlfromShort.push(copieurUrlDatabase[key].longURL);
-    }
-  } 
-  return arrUrlfromShort;
-}; */
-
-//    funtion Optionel
-
-const dbForUser = id => {
+const urlsForUser = id => {
   var copie_UrlDatabase = Object.assign({}, urlDatabase);
   // var userId = findUserId(copie_UrlDatabase, id)
   for (const key in copie_UrlDatabase) {
@@ -100,6 +85,7 @@ const dbForUser = id => {
   }
   return copie_UrlDatabase;
 };
+//    funtion Optionel
 
 const addNewUser = (email, password) => {
   const id = generateRandomString();
@@ -152,7 +138,7 @@ app.get("/urls", (req, res) => {
     obsUser: userDB[req.cookies.user_id],
     shortURL: req.params.shortURL,
     urlDatabase: urlDatabase,
-    urlsForUser: dbForUser(req.cookies.user_id), //urlsForUser
+    urlsForUser: urlsForUser(req.cookies.user_id), //urlsForUser
     user_email: req.cookies["email"],
     user_id: req.cookies.user_id,
     user_password: req.cookies["password"],
@@ -165,7 +151,7 @@ app.get("/urls/new", (req, res) => {
   let templateVars = {
     obsUser: userDB[req.cookies.user_id],
     user_id: req.cookies.user_id,
-    urls: dbForUser(req.cookies.user_id)
+    urls: urlsForUser(req.cookies.user_id)
   };
   if (templateVars.user_id) {
     res.render("urls_new", templateVars);
@@ -179,7 +165,7 @@ app.get("/urls/:shortURL", (req, res) => {
     objURL: urlDatabase[req.params.shortURL],
     obsUser: userDB[req.cookies.user_id],
     shortURL: req.params.shortURL,
-    urls: dbForUser(req.cookies.user_id),
+    urls: urlsForUser(req.cookies.user_id),
     user_email: req.cookies["email"],
     user_id: req.cookies.user_id,
     user_password: req.cookies["password"],
@@ -279,11 +265,10 @@ app.post("/register", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  const user = req.cookies.user_id;
-  const email = userDB[user].email;
-  const password = userDB[user].password;
-  res.clearCookie("user_id", user);
-  res.clearCookie("user_email", email);
-  res.clearCookie("user_password", password);
+  //const email = userDB[user].email;
+  //const password = userDB[user].password;
+  res.clearCookie("user_id");
+  res.clearCookie("user_email");
+  res.clearCookie("user_password");
   res.redirect("/urls");
 });

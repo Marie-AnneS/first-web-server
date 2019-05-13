@@ -24,19 +24,20 @@
   <%} else if (findUserId){%>  
   <h2>My URLs</h2>
   <ul>
-    <% for (var key in urlsForUser){%>
+    <% for (var short in urlsForUser){%>
     <li>
-      <b><a href="<%- urlsForUser[key].longURL %>"> <%- key %>:</a></b> ➡️ <%- urlsForUser[key].longURL %>
+      <b><a href="<%- urlsForUser[short].longURL %>"> <%- short %>:</a></b> ➡️ <%- urlsForUser[short].longURL %>
       <p style="display:inline-block; right: 0;">
-        <a href="/urls/<%- key %>">Upload l'url</a>
+        <a href="/urls/<%- short %>">Upload l'url</a>
       </p>
-      <form method="POST" action="/urls/<%- key %>/delete" style="display:inline-block; right: 0;">
+      <form method="POST" action="/urls/<%- short %>/delete" style="display:inline-block; right: 0;">
         <button type="submit" class="btn btn-primary">delete 🚮</button>
       </form>
     </li>
     <%}%>
       </ul>
   <%}%>
+  
     <h2>The URLs</h2>
     <ul>
       <% for (var key in urlDatabase){%>
