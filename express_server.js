@@ -12,10 +12,12 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.listen(PORT, () => {});
-app.use(cookieSession({
-  name: 'session',
-  keys: ["secretkeys"]
-}))
+app.use(
+  cookieSession({
+    name: "session",
+    keys: ["secretkeys"]
+  })
+);
 
 //  --------- DATABASE  -------------------------  //
 
@@ -27,7 +29,7 @@ const urlDatabase = {
 };
 
 const userDB = {
-  "aJ48lW": {
+  aJ48lW: {
     id: "aJ48lW",
     email: "t1@t1.com",
     password: bcrypt.hashSync("t1", 10)
@@ -39,31 +41,30 @@ const userDB = {
   }
 };
 
-//  --------- Function  -------------------------  //
+//-----------   Require Function    ---------//
 
-//    funtion Obligatoire
 const generateRandomString = () =>
   Math.random()
     .toString(36)
     .substr(7);
 
-const findUserId = (user_id_bd, user_id) => {
+/* const findUserId = (user_id_bd, user_id) => {
   for (const key in user_id_bd) {
     if (user_id_bd[key].userID === user_id) {
       return true;
     }
   }
   return false;
-};
-//!!! enlever
-const findEmail = (dB, email) => {
-  for (const key in dB) {
-    if (dB[key].email === email) {
-      return key;
-    }
+}; */
+
+const findUserId = (user_id_bd, user_id) => {
+  for (const key in user_id_bd) {
+    return user_id_bd[key].userID === user_id;
   }
   return false;
 };
+
+//console.log(findUserId(urlDatabase, "aJ48lW"));
 
 const findUserByEmail = (dB, email) => {
   for (const key in dB) {
@@ -76,16 +77,16 @@ const findUserByEmail = (dB, email) => {
 
 const urlsForUser = id => {
   var copie_UrlDatabase = Object.assign({}, urlDatabase);
-  // var userId = findUserId(copie_UrlDatabase, id)
-  for (const key in copie_UrlDatabase) {
-    if (copie_UrlDatabase[key].userID !== id) {
-      copie_UrlDatabase;
-      delete copie_UrlDatabase[key];
+  for (const sortKey in copie_UrlDatabase) {
+    if (copie_UrlDatabase[sortKey].userID !== id) {
+      // a enlever copie_UrlDatabase;
+      delete copie_UrlDatabase[sortKey];
     }
   }
   return copie_UrlDatabase;
 };
-//    funtion Optionel
+
+//-----------   Optionel Function    ---------//
 
 const addNewUser = (email, password) => {
   const id = generateRandomString();
@@ -98,14 +99,6 @@ const addNewUser = (email, password) => {
   userDB[id] = obj_id;
   return obj_id;
 };
-//!!! pas utilise
-const addNewObjUrl = (longUrl, user_id) => {
-  const NewObjURL = {
-    longUrl: longUrl,
-    user_id: user_id
-  };
-  return NewObjURL;
-};
 
 const authentif = function(email, passwordpm) {
   var userId = findUserByEmail(userDB, email);
@@ -116,7 +109,7 @@ const authentif = function(email, passwordpm) {
 
 const deleteUrl = idUrl => {
   delete urlDatabase[idUrl];
-}; //deleteUrl("9sm5xK"); console.log(urlDatabase);
+};
 
 //-------------GET  Mes routes des pages   ---------//
 
@@ -144,6 +137,7 @@ app.get("/urls", (req, res) => {
     user_password: req.cookies["password"],
     userDB: userDB
   };
+  console.log(urlDatabase);
   res.render("urls_index", templateVars);
 });
 
@@ -250,23 +244,23 @@ app.post("/login", (req, res) => {
 
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
-  const criptPassword = bcrypt.hashSync(password, 10);
+  //const criptPassword = bcrypt.hashSync(password, 10);
   let user_id = findUserByEmail(userDB, email);
 
   if (user_id || !email || !password) {
     res.status(400).send("Votre Email ou Password existe deja");
   } else {
-    let new_user = addNewUser(email, criptPassword);
+    let new_user = addNewUser(email, password);
+    //console.log(addNewUser); OK
+    console.log(userDB);
     res.cookie("user_id", new_user.id);
     res.cookie("user_email", email);
-    res.cookie("user_password", criptPassword);
+    res.cookie("user_password", password);
     res.redirect("/urls");
   }
 });
 
 app.post("/logout", (req, res) => {
-  //const email = userDB[user].email;
-  //const password = userDB[user].password;
   res.clearCookie("user_id");
   res.clearCookie("user_email");
   res.clearCookie("user_password");
