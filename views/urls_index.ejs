@@ -13,7 +13,7 @@
 
 <body style="font-size:20px; padding:50px;">
 
- <!--  Object.keys(userDB)  -->
+  <!--  Object.keys(userDB)  -->
 
   <%- include partials/_header.ejs %>
   <% if ( !user_id ){ %>
@@ -21,7 +21,7 @@
 
 
 
-  <%} else if (findUserId){%>  
+  <%} else if (findUserId){%>
   <h2>My URLs</h2>
   <ul>
     <% for (var short in urlsForUser){%>
@@ -37,7 +37,7 @@
     <%}%>
       </ul>
   <%}%>
-  
+
     <h2>The URLs</h2>
     <ul>
       <% for (var key in urlDatabase){%>
