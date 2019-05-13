@@ -7,7 +7,7 @@
 
 
 <!-- LOGIN -->
-<% if ( user_id ){%>
+<% if ( findUserId ){%>
 <div style="display: flex;">
     <h3 style="padding-right: 10px;"><a href="/urls">URLs</a> | </h3>
     <h3><a href="/urls/new">Create New TinyURL</a></h3>
@@ -17,15 +17,17 @@
         <button type="submit" name="ereaseCookies" class="btn btn-primary">Logout</button>
     </div>
 </form>
-<p style="display: inline-block;">Logged in As: <%= obsUser.email %></p>
 
 
+<p style="display: inline-block;">Logged in As: <%= obsUser.email %></p> 
 <!-- LOGOUT -->
 <%} else {%>
+
 
 <div style="display: flex;">
     <h3 style="padding-right: 10px;"><a href="/login">Login</a> | </h3>
     <h3><a href="/register">Register</a></h3>
 </div>
+
 
 <%}%> 

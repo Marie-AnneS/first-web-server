@@ -48,9 +48,11 @@ const generateRandomString = () =>
     .toString(36)
     .substr(7);
 
-const findUserId = (user_id_bd, user_id) => {
-  for (const key in user_id_bd) {
-    return user_id_bd[key].userID === user_id;
+const findUserId = (userDb, userId) => {
+  for (const key in userDb) {
+    if (userDb[key].id === userId) {
+      return userDb[key];
+    }
   }
   return false;
 };
@@ -78,20 +80,20 @@ const urlsForUser = id => {
 
 const addNewUser = (email, password) => {
   const id = generateRandomString();
-  const obj_id = {
+  const userObj = {
     id,
     email,
     password: bcrypt.hashSync(password, 10)
   };
 
-  userDB[id] = obj_id;
-  return obj_id;
+  userDB[id] = userObj;
+  return userObj;
 };
 
 const authentif = function(email, passwordpm) {
   var userId = findUserByEmail(userDB, email);
   if (userId && bcrypt.compareSync(passwordpm, userDB[userId].password)) {
-    return true;
+    return userId;
   }
 };
 
@@ -102,7 +104,7 @@ const deleteUrl = idUrl => {
 //-------------GET  Mes routes des pages   ---------//
 
 app.get("/", (req, res) => {
-  if (user_id) {
+  if (req.session.user_id) {
     res.redirect("/urls");
   } else {
     res.redirect("/login");
@@ -111,27 +113,25 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const usertest = req.cookies.user_id;
   let templateVars = {
-    findUserId: findUserId(urlDatabase, req.cookies.user_id),
-    longURL: urlDatabase[req.cookies.user_id],
-    obsUser: userDB[req.cookies.user_id],
-    shortURL: req.params.shortURL,
-    urlDatabase: urlDatabase,
-    urlsForUser: urlsForUser(req.cookies.user_id),
-    user_email: req.cookies["email"],
-    user_id: req.cookies.user_id,
-    user_password: req.cookies["password"],
-    userDB: userDB
+    findUserId: findUserId(userDB, req.session.user_id), //!!! user obj ou false
+    longURL: urlDatabase[req.session.user_id],
+    obsUser: userDB[req.session.user_id], //@@@ ? pas capabkle autrement
+    urlsForUser: urlsForUser(req.session.user_id) //!!! a garder
   };
+  if (!findUserId) {
+    res.status(401).send("Status 401 : You are not login");
+  }
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    obsUser: userDB[req.cookies.user_id],
-    user_id: req.cookies.user_id,
-    urls: urlsForUser(req.cookies.user_id)
+    findUserId: findUserId(userDB, req.session.user_id), //!!! user obj ou false
+
+    obsUser: userDB[req.session.user_id],
+    user_id: req.session.user_id,
+    urls: urlsForUser(req.session.user_id)
   };
   if (templateVars.user_id) {
     res.render("urls_new", templateVars);
@@ -141,52 +141,51 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = {
-    objURL: urlDatabase[req.params.shortURL],
-    obsUser: userDB[req.cookies.user_id],
-    shortURL: req.params.shortURL,
-    urls: urlsForUser(req.cookies.user_id),
-    user_email: req.cookies["email"],
-    user_id: req.cookies.user_id,
-    user_password: req.cookies["password"],
-    userDB: userDB
-  };
-  if (!req.cookies.user_id) {
-    res.status(401).send("Status 401 : You are not login");
+  const shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL];
+  if (!longURL) {
+    return res.status(404).send("Status 404 : ");
   }
+  let templateVars = {
+    shortURL,
+    longURL: longURL.longURL,
+    findUserId: findUserId(userDB, req.session.user_id),
+    obsUser: userDB[req.session.user_id],
+    urlsForUser: urlsForUser(req.session.user_id)
+  };
+  if (!templateVars.findUserId) {
+    return res.status(403).send("Status 403 : ");
+  }
+
   res.render("urls_show", templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
   const shortUrl = req.params.shortURL;
   const longURL = urlDatabase[shortUrl].longURL;
-
   res.redirect(longURL);
 });
 
 app.get("/login", (req, res) => {
   let templateVars = {
-    user_id: req.cookies.user_id,
-    userDB: userDB,
-    obsUser: userDB[req.cookies.user_id]
+    user_id: req.session.user_id,
+    findUserId: findUserId(userDB, req.session.user_id),
+    obsUser: userDB[req.session.user_id]
   };
   res.render("login", templateVars);
 });
 
 app.get("/register", (req, res) => {
   let templateVars = {
-    user_id: req.cookies.user_id,
-    userDB: userDB,
-    obsUser: userDB[req.cookies.user_id]
+    findUserId: findUserId(userDB, req.session.user_id),
+    obsUser: userDB[req.session.user_id]
   };
   res.render("register", templateVars);
 });
 
 app.get("/logout", (req, res) => {
   let templateVars = {
-    user_id: req.cookies.user_id,
-    user_email: req.cookies["email"],
-    user_password: req.cookies["password"],
+    user_id: req.session.user_id,
     userDB: userDB
   };
   res.render("urls_index", templateVars);
@@ -197,30 +196,33 @@ app.get("/logout", (req, res) => {
 app.post("/urls", (req, res) => {
   const ramdomShortUrl = generateRandomString();
   const LongUrl = req.body.longURL;
-  const user = req.cookies.user_id;
+  const user = req.session.user_id;
   urlDatabase[ramdomShortUrl] = { longURL: LongUrl, userID: user };
   res.redirect("/urls");
 });
 
 app.post("/urls/:shortURL", (req, res) => {
-  const shortUrl = req.params.shortURL;
   urlDatabase[req.params.shortURL].longURL = req.body.newUrl;
   res.redirect("/urls");
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortUrl = req.params.shortURL;
-  deleteUrl(shortUrl);
-  res.redirect("/urls");
+  const urls = urlsForUser(req.session.user_id);
+  console.log(urls);
+  if (urls[shortUrl]) {
+    deleteUrl(shortUrl);
+    res.redirect("/urls");
+  } else {
+    res.status(403).send("Status @@@ : your not login");
+  }
 });
 
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  let user_id = findUserByEmail(userDB, email);
-  if (authentif(email, password)) {
-    res.cookie("user_id", user_id);
-    res.cookie("user_email", email);
-    res.cookie("user_password", password);
+  let user_id = authentif(email, password);
+  if (user_id) {
+    req.session.user_id = user_id;
     res.redirect("/urls");
   } else {
     res.status(403).send("Status 403 : Bad email or passeword");
@@ -230,20 +232,18 @@ app.post("/login", (req, res) => {
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
   let user_id = findUserByEmail(userDB, email);
-  if (user_id || !email || !password) {
-    res.status(400).send("Status 400 : Email or Password already exists");
+  if (user_id) {
+    res.status(400).send("Status 400 : Email already exists");
+  } else if (!email || !password) {
+    res.status(400).send("Status 400 : empty ");
   } else {
     let new_user = addNewUser(email, password);
-    res.cookie("user_id", new_user.id);
-    res.cookie("user_email", email);
-    res.cookie("user_password", password);
+    req.session.user_id = new_user.id;
     res.redirect("/urls");
   }
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
-  res.clearCookie("user_email");
-  res.clearCookie("user_password");
-  res.redirect("/urls");
+  req.session = null;
+  res.redirect("/login");
 });

@@ -13,15 +13,9 @@
 
 <body style="font-size:20px; padding:50px;">
 
-  <!--  Object.keys(userDB)  -->
 
   <%- include partials/_header.ejs %>
-  <% if ( !user_id ){ %>
-  <p style="color:maroon;">Welcome before you start please login or register</p>
 
-
-
-  <%} else {%>
   <div style="padding: 15px;  margin-top: 10px;  background-color: #f8f9fa;">
     <h2>My URLs</h2>
     <ul>
@@ -37,7 +31,7 @@
       </li>
       <%}%>
       </ul>
-  <%}%>
+
   </div>
 
 </body>
