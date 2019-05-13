@@ -4,3 +4,33 @@
           <button type="submit" class="btn btn-primary">delete 🚮</button>
         </form>
       </li> -->
+
+
+      <!--   <% if (objURL.userID !== user_id){ %>
+
+  Vous n'avez pas acces a cette page
+  <% } else {%>
+<% }%> -->
+
+
+if (!req.cookies.user_id) {
+    res.status(401).send("Status 401 : You are not login");
+
+
+
+
+    pour les url 
+
+
+
+
+  <h2>The URLs</h2>
+  <ul>
+    <% for (var key in urlDatabase){%>
+    <li>
+      <b><a href="/urls/<%- key %>"> <%- key %>:</a></b> ➡️ <%- urlDatabase[key].longURL %>
+    </li>
+    <%}%>
+      </ul>
+
+ 

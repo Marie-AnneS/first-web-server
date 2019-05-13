@@ -17,37 +17,29 @@
 
   <%- include partials/_header.ejs %>
   <% if ( !user_id ){ %>
-  <p style="color:maroon;">Merci de vous login ou register</p>
+  <p style="color:maroon;">Welcome before you start please login or register</p>
 
 
 
   <%} else {%>
-  <h2>My URLs</h2>
-  <ul>
-    <% for (var short in urlsForUser){%>
-    <li>
-      <b><a href="<%- urlsForUser[short].longURL %>"> <%- short %>:</a></b> ➡️ <%- urlsForUser[short].longURL %>
-      <p style="display:inline-block; right: 0;">
-        <a href="/urls/<%- short %>">Upload l'url</a>
-      </p>
-      <form method="POST" action="/urls/<%- short %>/delete" style="display:inline-block; right: 0;">
-        <button type="submit" class="btn btn-primary">delete 🚮</button>
-      </form>
-    </li>
-    <%}%>
-      </ul>
-  <%}%>
-
-    <h2>The URLs</h2>
+  <div style="padding: 15px;  margin-top: 10px;  background-color: #f8f9fa;">
+    <h2>My URLs</h2>
     <ul>
-      <% for (var key in urlDatabase){%>
+      <% for (var short in urlsForUser){%>
       <li>
-        <b><a href="/urls/<%- key %>"> <%- key %>:</a></b> ➡️ <%- urlDatabase[key].longURL %>
+        <b><a href="<%- urlsForUser[short].longURL %>"> <%- short %>:</a></b> ➡️ <%- urlsForUser[short].longURL %>
+        <p style="display:inline-block; right: 0;">
+          <a href="/urls/<%- short %>" style="border: 1px solid #ccc; border-radius: 5px; padding: 7px;"> Update </a>
+        </p>
+        <form method="POST" action="/urls/<%- short %>/delete" style="display:inline-block; right: 0;">
+          <button type="submit" class="btn btn-primary">delete 🚮</button>
+        </form>
       </li>
       <%}%>
       </ul>
+  <%}%>
+  </div>
 
- 
 </body>
 
 </html>

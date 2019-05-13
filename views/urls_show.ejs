@@ -14,10 +14,6 @@
 <body style="font-size:20px; padding:50px;">
   <%- include partials/_header.ejs %>
 
-  <% if (objURL.userID !== user_id){ %>
-
-  Vous n'avez pas acces a cette page
-  <% } else {%>
 
   <h2><b>Short URL:</b> <%= shortURL %></h2>
   <h2><b>Long Url:</b> <%= objURL.longURL %></h2>
@@ -33,7 +29,7 @@
   <form method="POST" action="/urls/<%- shortURL %>/delete" style="display:inline-block;">
     <button type="submit" class="btn btn-primary">delete 🚮</button>
   </form>
-  <% }%>
+  
 </body>
 
 </html>

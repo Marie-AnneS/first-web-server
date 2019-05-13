@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser"); // !!! a enleve
+const cookieParser = require("cookie-parser");
 const cookieSession = require("cookie-session");
 const express = require("express");
 const http = require("http");
@@ -151,7 +151,9 @@ app.get("/urls/:shortURL", (req, res) => {
     user_password: req.cookies["password"],
     userDB: userDB
   };
-
+  if (!req.cookies.user_id) {
+    res.status(401).send("Status 401 : You are not login");
+  }
   res.render("urls_show", templateVars);
 });
 
@@ -221,20 +223,17 @@ app.post("/login", (req, res) => {
     res.cookie("user_password", password);
     res.redirect("/urls");
   } else {
-    res.status(403).send("Votre email ou passe]word n'est pas le bon");
+    res.status(403).send("Status 403 : Bad email or passeword");
   }
 });
 
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
-  //const criptPassword = bcrypt.hashSync(password, 10);
   let user_id = findUserByEmail(userDB, email);
   if (user_id || !email || !password) {
-    res.status(400).send("Votre Email ou Password existe deja");
+    res.status(400).send("Status 400 : Email or Password already exists");
   } else {
     let new_user = addNewUser(email, password);
-    //console.log(addNewUser); OK
-    console.log(userDB);
     res.cookie("user_id", new_user.id);
     res.cookie("user_email", email);
     res.cookie("user_password", password);
