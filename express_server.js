@@ -48,23 +48,12 @@ const generateRandomString = () =>
     .toString(36)
     .substr(7);
 
-/* const findUserId = (user_id_bd, user_id) => {
-  for (const key in user_id_bd) {
-    if (user_id_bd[key].userID === user_id) {
-      return true;
-    }
-  }
-  return false;
-}; */
-
 const findUserId = (user_id_bd, user_id) => {
   for (const key in user_id_bd) {
     return user_id_bd[key].userID === user_id;
   }
   return false;
 };
-
-//console.log(findUserId(urlDatabase, "aJ48lW"));
 
 const findUserByEmail = (dB, email) => {
   for (const key in dB) {
@@ -79,7 +68,6 @@ const urlsForUser = id => {
   var copie_UrlDatabase = Object.assign({}, urlDatabase);
   for (const sortKey in copie_UrlDatabase) {
     if (copie_UrlDatabase[sortKey].userID !== id) {
-      // a enlever copie_UrlDatabase;
       delete copie_UrlDatabase[sortKey];
     }
   }
@@ -114,30 +102,28 @@ const deleteUrl = idUrl => {
 //-------------GET  Mes routes des pages   ---------//
 
 app.get("/", (req, res) => {
-  /* if (user_id){
+  if (user_id) {
     res.redirect("/urls");
   } else {
     res.redirect("/login");
-  } */
+  }
   res.redirect("/urls");
 });
 
 app.get("/urls", (req, res) => {
   const usertest = req.cookies.user_id;
-  console.log(usertest);
   let templateVars = {
     findUserId: findUserId(urlDatabase, req.cookies.user_id),
     longURL: urlDatabase[req.cookies.user_id],
     obsUser: userDB[req.cookies.user_id],
     shortURL: req.params.shortURL,
     urlDatabase: urlDatabase,
-    urlsForUser: urlsForUser(req.cookies.user_id), //urlsForUser
+    urlsForUser: urlsForUser(req.cookies.user_id),
     user_email: req.cookies["email"],
     user_id: req.cookies.user_id,
     user_password: req.cookies["password"],
     userDB: userDB
   };
-  console.log(urlDatabase);
   res.render("urls_index", templateVars);
 });
 
@@ -194,7 +180,6 @@ app.get("/register", (req, res) => {
   res.render("register", templateVars);
 });
 
-// !!! avoir s'il faut garder
 app.get("/logout", (req, res) => {
   let templateVars = {
     user_id: req.cookies.user_id,
@@ -211,14 +196,13 @@ app.post("/urls", (req, res) => {
   const ramdomShortUrl = generateRandomString();
   const LongUrl = req.body.longURL;
   const user = req.cookies.user_id;
-
   urlDatabase[ramdomShortUrl] = { longURL: LongUrl, userID: user };
-  res.redirect("/urls"); // Respond with 'Ok' (we will replace this)
+  res.redirect("/urls");
 });
 
 app.post("/urls/:shortURL", (req, res) => {
   const shortUrl = req.params.shortURL;
-  urlDatabase[req.params.shortURL].longURL = req.body.newUrl; // Log the POST request body to the console
+  urlDatabase[req.params.shortURL].longURL = req.body.newUrl;
   res.redirect("/urls");
 });
 
@@ -231,7 +215,6 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
   let user_id = findUserByEmail(userDB, email);
-
   if (authentif(email, password)) {
     res.cookie("user_id", user_id);
     res.cookie("user_email", email);
@@ -246,7 +229,6 @@ app.post("/register", (req, res) => {
   const { email, password } = req.body;
   //const criptPassword = bcrypt.hashSync(password, 10);
   let user_id = findUserByEmail(userDB, email);
-
   if (user_id || !email || !password) {
     res.status(400).send("Votre Email ou Password existe deja");
   } else {
