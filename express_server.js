@@ -114,10 +114,10 @@ app.get("/", (req, res) => {
 
 app.get("/urls", (req, res) => {
   let templateVars = {
-    findUserId: findUserId(userDB, req.session.user_id), //!!! user obj ou false
+    findUserId: findUserId(userDB, req.session.user_id), 
     longURL: urlDatabase[req.session.user_id],
-    obsUser: userDB[req.session.user_id], //@@@ ? pas capabkle autrement
-    urlsForUser: urlsForUser(req.session.user_id) //!!! a garder
+    obsUser: userDB[req.session.user_id],
+    urlsForUser: urlsForUser(req.session.user_id) 
   };
   if (!findUserId) {
     res.status(401).send("Status 401 : You are not login");
@@ -127,7 +127,7 @@ app.get("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    findUserId: findUserId(userDB, req.session.user_id), //!!! user obj ou false
+    findUserId: findUserId(userDB, req.session.user_id), 
 
     obsUser: userDB[req.session.user_id],
     user_id: req.session.user_id,
