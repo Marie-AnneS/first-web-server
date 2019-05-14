@@ -144,7 +144,7 @@ app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
   if (!longURL) {
-    return res.status(404).send("Status 404 : ");
+    return res.status(404).send("Status 404 : page dont existe ");
   }
   let templateVars = {
     shortURL,
@@ -154,7 +154,7 @@ app.get("/urls/:shortURL", (req, res) => {
     urlsForUser: urlsForUser(req.session.user_id)
   };
   if (!templateVars.findUserId) {
-    return res.status(403).send("Status 403 : ");
+    return res.status(403).send("Status 403 : You do not have access to this page");
   }
 
   res.render("urls_show", templateVars);
@@ -214,7 +214,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     deleteUrl(shortUrl);
     res.redirect("/urls");
   } else {
-    res.status(403).send("Status @@@ : your not login");
+    res.status(403).send("Status 403 : you can not do this action");
   }
 });
 
@@ -233,9 +233,9 @@ app.post("/register", (req, res) => {
   const { email, password } = req.body;
   let user_id = findUserByEmail(userDB, email);
   if (user_id) {
-    res.status(400).send("Status 400 : Email already exists");
+    res.status(403).send("Status 403 : Email already exists");
   } else if (!email || !password) {
-    res.status(400).send("Status 400 : empty ");
+    res.status(403).send("Status 403 : empty email or password ");
   } else {
     let new_user = addNewUser(email, password);
     req.session.user_id = new_user.id;
